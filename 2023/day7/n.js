@@ -44,15 +44,16 @@ const scoreHand = ([s, score]) => {
   const id = Object.values(updatedHand).sort().reverse().join("");
   const rank = possibleHands[id];
 
-  const sortedHand = Object.entries(updatedHand).sort(
-    ([symbolA, amountA], [symbolB, amountB]) => {
-      return amountB === amountA
-        ? giveNumber(symbolB) > giveNumber(symbolA)
-        : amountB > amountA;
-    }
-  );
+  // Uncomment to sort hand
+  // const sortedHand = Object.entries(updatedHand).sort(
+  //   ([symbolA, amountA], [symbolB, amountB]) => {
+  //     return amountB === amountA
+  //       ? giveNumber(symbolB) > giveNumber(symbolA)
+  //       : amountB > amountA;
+  //   }
+  // );
 
-  return [rank, sortedHand, score];
+  return [rank, s.split(""), score];
 };
 
 const hasHighestCard = (h1, h2) => {
@@ -80,4 +81,3 @@ const sorted = res.sort(([rankA, handA, _], [rankB, handB, __]) => {
 const score = sorted.reduce((acc, [_, __, n], i) => (i + 1) * n + acc, 0);
 
 console.log(score);
-// console.log(sorted.map(([_, h, __]) => h.map(([f, l]) => f).join("")));
