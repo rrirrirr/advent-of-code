@@ -12,18 +12,11 @@ const mapHorizontal = (grid) => {
   }, Object.fromEntries(grid.map((r) => [r, []])));
 };
 
-const mapVertical = (grid) => {
-  const transposedGrid = grid.map((_, colIndex) =>
-    grid.map((row) => row[colIndex]).join("")
-  );
-
-  return transposedGrid.reduce((acc, c, i) => {
-    if (!acc[c]) {
-      acc[c] = [];
-    }
-    acc[c].push(i);
-    return acc;
-  }, {});
+const transposeGrid = (grid) => {
+  return grid[0]
+    .split("")
+    .map((_, colIndex) => grid.map((row) => row[colIndex]).join(""))
+    .filter(Boolean);
 };
 
 const lookForHorizontalReflection = (grid) => {
@@ -31,16 +24,17 @@ const lookForHorizontalReflection = (grid) => {
 
   const startingPoints = Object.entries(map)
     .filter(([_, nums]) => nums.length > 1)
-    .map(([_, nums]) => {
-      return nums;
-    })
-    .filter(([anum, bnum], i) => {
-      return anum + 1 === bnum;
+    .flatMap(([_, nums]) => {
+      return nums
+        .reduce((acc, num, i) => {
+          return num + 1 === nums[i + 1] ? [...acc, [num, nums[i + 1]]] : acc;
+        }, [])
+        .filter((a) => a.length);
     });
 
   const mirrored = startingPoints.filter(([a, b]) => {
-    let up = a - 1;
-    let down = b + 1;
+    let up = a;
+    let down = b;
 
     while (up >= 0 && down < grid.length) {
       if (grid[up] !== grid[down]) {
@@ -57,26 +51,26 @@ const lookForHorizontalReflection = (grid) => {
 };
 
 const lookForVerticalReflection = (grid) => {
-  const map = mapVertical(grid);
+  const transposed = transposeGrid(grid);
+  const map = mapHorizontal(transposed);
 
   const startingPoints = Object.entries(map)
     .filter(([_, nums]) => nums.length > 1)
-    .map(([_, nums]) => {
-      return nums;
-    })
-    .filter(([anum, bnum], i) => {
-      return anum + 1 === bnum;
+    .flatMap(([_, nums]) => {
+      return nums
+        .reduce((acc, num, i) => {
+          return num + 1 === nums[i + 1] ? [...acc, [num, nums[i + 1]]] : acc;
+        }, [])
+        .filter((a) => a.length);
     });
 
   const mirrored = startingPoints.filter(([a, b]) => {
-    let left = a - 1;
-    let right = b + 1;
+    let left = a;
+    let right = b;
 
-    while (left >= 0 && right < grid[0].length) {
-      for (let row = 0; row < grid.length; row++) {
-        if (grid[row][left] !== grid[row][right]) {
-          return false;
-        }
+    while (left >= 0 && right < transposed.length) {
+      if (transposed[left] !== transposed[right]) {
+        return false;
       }
       left--;
       right++;
@@ -88,15 +82,12 @@ const lookForVerticalReflection = (grid) => {
   return mirrored;
 };
 
-console.log("horizontal:", lookForHorizontalReflection(input[0]));
-console.log("vertical:", lookForVerticalReflection(input[0]));
+const res =
+  input
+    .flatMap(lookForHorizontalReflection)
+    .reduce((acc, [__, n, _]) => acc + n * 100, 0) +
+  input.flatMap(lookForVerticalReflection).reduce((acc, [_, n]) => {
+    return acc + n;
+  }, 0);
 
-// const res =
-// input
-//   .flatMap(lookForHorizontalReflection)
-//   .reduce((acc, [n, _]) => (n + 1) * 100, 0) +
-// input
-//   .flatMap(lookForVerticalReflection)
-//   .reduce((acc, [n, _]) => (n + 1) * 1, 0);
-
-// console.log(res);
+console.log(res);
