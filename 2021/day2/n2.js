@@ -16,12 +16,11 @@ const instructions = {
   down: ([depth, hor, aim], v) => [depth, hor, aim + v],
 };
 
-const position = input.reduce(
-  (pos, instruction) => {
-    const [instructionType, length] = instruction;
-    return instructions[instructionType](pos, length);
-  },
-  [0, 0, 0],
-);
+const getNewPosition = (position, instruction) => {
+  const [instructionType, length] = instruction;
+  return instructions[instructionType](position, length);
+};
+
+const position = input.reduce(getNewPosition, [0, 0, 0]);
 
 console.log(position[0] * position[1]);
