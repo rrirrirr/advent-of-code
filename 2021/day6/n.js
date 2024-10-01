@@ -2,30 +2,23 @@ const input = await Bun.file("input")
   .text()
   .then((v) => v.split(",").filter(Boolean).map(Number));
 
-const spawns = Array(80).fill(0);
+const days = 256;
 
-for (let i = 6; i <= 32; i++) {
-  let res = 0;
-  const newLants = Math.floor(i / 6);
-  res += newLants;
-  if (i === 32) {
-    console.log("new", newLants);
-  }
+const spawns = Array(days + 6).fill(0);
 
-  for (let j = 0; j <= newLants; j++) {
-    if (i === 32) {
-      console.log("n", i - j * 6 - 2);
-      console.log("res:", spawns[i - Math.max(j * 6 - 2, 0)]);
+for (let i = 7; i <= days + 6; i++) {
+  let newLants = Math.floor(i / 7);
+  spawns[i] = newLants;
+  for (let j = 1; j < newLants; j++) {
+    let idx = i - j * 7 - 2;
+    if (idx >= 0) {
+      spawns[i] += spawns[idx];
     }
-    res += spawns[i - Math.max(j * 6 - 2, 0)];
   }
-
-  spawns[i] = res;
 }
 
 const res = input.map((v) => {
-  return spawns[80 - v];
+  return spawns[days + (6 - v)];
 });
 
-console.log(res.reduce((tot, v) => tot + v, 0));
-console.log(spawns);
+console.log(res.reduce((tot, v) => tot + v, 0) + res.length);
