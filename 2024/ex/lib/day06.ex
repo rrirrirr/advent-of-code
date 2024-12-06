@@ -13,30 +13,19 @@ defmodule Day06 do
   def part_2(file) do
     grid = get_input(file)
 
-    {x, y} =
+    {x_start, y_start} =
       find_start_pos(grid)
 
-    modified_grids =
-      travel(grid, {x, y, "up"}, MapSet.new())
-      |> MapSet.to_list()
-      |> Enum.drop(1)
-      |> Stream.map(fn {x, y} ->
+    travel(grid, {x_start, y_start, "up"}, MapSet.new())
+    |> MapSet.to_list()
+    |> Enum.drop(1)
+    |> Task.async_stream(
+      fn {x, y} ->
         grid
         |> List.update_at(y, fn row ->
           List.update_at(row, x, fn _ -> "#" end)
         end)
-      end)
-      |> Enum.to_list()
-
-    total_count = length(modified_grids)
-
-    modified_grids
-    |> Stream.with_index()
-    |> Task.async_stream(
-      fn {grid, idx} ->
-        percent = trunc(idx / total_count * 100)
-        IO.inspect("doing #{idx} of #{total_count} (#{percent}% done)")
-        look_for_loop(grid, {x, y, "up"}, MapSet.new())
+        |> look_for_loop({x_start, y_start, "up"}, MapSet.new())
       end,
       max_concurrency: System.schedulers_online()
     )
