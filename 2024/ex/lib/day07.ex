@@ -21,10 +21,7 @@ defmodule Day07 do
         numbers
         |> solve_equations_ltrc([], :start)
         |> Enum.member?(test_value)
-        |> then(fn
-          true -> test_value
-          false -> 0
-        end)
+        |> if(do: test_value, else: 0)
       end,
       max_concurrency: System.schedulers_online()
     )
