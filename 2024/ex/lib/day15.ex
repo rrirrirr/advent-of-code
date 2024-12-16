@@ -251,52 +251,6 @@ defmodule Day15 do
     end
   end
 
-  # left
-  # ][ = O,  [] -, [[ = impossible, ]] = impossible
-
-  # first row is always the one to merge into
-  # defp join_rows(row1, row2, :left) do
-  #   Enum.zip(row1, row2)
-  #   |> Enum.map(fn
-  #     {"#", _} -> "#"
-  #     {_, "#"} -> "#"
-  #     {"]", "["} -> "O"
-  #     {"[", "]"} -> "-"
-  #     {"[", _} -> "["
-  #     {"]", _} -> "]"
-  #     {_, "."} -> "."
-  #     {".", _} -> "."
-  #   end)
-  # end
-
-  # right
-  # ][ = -,  []  = 0, [[ = impossible, ]] = impossible
-
-  # first row is always the one to merge into
-  # defp join_rows(row1, row2, :right) do
-  #   Enum.zip(row1, row2)
-  # |> Enum.map(fn
-  #   {"#", _} -> "#"
-  #   {_, "#"} -> "#"
-  #   {"[", "]"} -> "O"
-  #   {"]", "["} -> "-"
-  #   {"]", _} -> "O"
-  #   {".", _} -> "."
-  #   {_, "."} -> "."
-  # end)
-  # end
-
-  defp dmove_robot(grid, :down) do
-    transposed_grid = transpose_grid(grid)
-    {before_robot, robot_row, after_robot} = find_robot_row([], transposed_grid)
-
-    updated_row =
-      eliminate_empty_space_before_robot(Enum.reverse(robot_row), 0, [], [])
-      |> Enum.reverse()
-
-    (before_robot ++ [updated_row] ++ after_robot) |> transpose_grid()
-  end
-
   defp move_robot(grid, :left) do
     {before_robot, robot_row, after_robot} = find_robot_row([], grid)
     updated_row = eliminate_empty_space_before_robot(robot_row, 0, [], [])
@@ -353,13 +307,6 @@ defmodule Day15 do
       before ++ [movable],
       original ++ [movable]
     )
-  end
-
-  defp find_robot_col(pre, [row_to_look_at | rest]) do
-    cond do
-      Enum.member?(row_to_look_at, "@") -> {Enum.reverse(pre), row_to_look_at, rest}
-      true -> find_robot_row([row_to_look_at | pre], rest)
-    end
   end
 
   defp find_robot_row(pre, [row_to_look_at | rest]) do
