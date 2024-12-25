@@ -47,88 +47,8 @@ defmodule Day21 do
     codes =
       get_input(file)
 
-    after_num =
-      codes
-      |> Enum.map(&type_code(&1, "A"))
-
-    after_num
-    |> Enum.map(fn sequences ->
-      1..2
-      |> Enum.reduce({sequences, %{}}, fn step, {current_sequences, cache} ->
-        IO.inspect(length(hd(current_sequences)), label: step)
-
-        {updated_seq, updated_cache} =
-          current_sequences
-          |> Enum.reduce({:no, cache}, fn sequence, {shortest_seq, cache} ->
-            {current_seq, current_cache} = find_seq(sequence, cache)
-
-            cond do
-              shortest_seq == :no -> {current_seq, current_cache}
-              length(current_seq) < length(shortest_seq) -> {current_seq, current_cache}
-              true -> {shortest_seq, cache}
-            end
-          end)
-
-        {[updated_seq], updated_cache}
-      end)
-    end)
-    |> Enum.map(&(elem(&1, 0) |> hd() |> length()))
-    |> Enum.zip(codes)
-    |> Enum.reduce(0, fn {key_presses, code}, total ->
-      code_value =
-        code
-        |> Enum.take_while(&(&1 != "A"))
-        |> Enum.join("")
-        |> String.to_integer()
-
-      IO.inspect("#{code} #{key_presses}")
-      total + key_presses * code_value
-    end)
-    |> IO.inspect(charlists: false)
-
-    # 1..1
-    # |> Enum.reduce(after_num, fn _, shortest_paths ->
-    #   shortest_paths
-    #   |> Enum.map(fn possible ->
-    #     possible
-    #     # |> tap(&IO.inspect(Enum.count(&1), label: "Count"))
-    #     |> Enum.with_index()
-    #     |> Task.async_stream(
-    #       fn {list, idx} ->
-    #         IO.inspect("#{idx}")
-
-    #         type_code_arrow(list, :press)
-    #         |> tap(&IO.inspect(Enum.count(&1), label: "Count"))
-    #       end,
-    #       timeout: :infinity,
-    #       ordered: false,
-    #       max_concurrency: System.schedulers_online()
-    #     )
-    #     |> Stream.map(fn {:ok, result} ->
-    #       result
-    #     end)
-    #     |> Enum.to_list()
-    #     |> Enum.flat_map(& &1)
-    #   end)
-    # end)
-    # |> IO.inspect()
-  end
-
-  def part_3(file) do
-    codes =
-      get_input(file)
-
-    # after_num =
-    # codes
-    # |> Enum.map(&type_code(&1, "A"))
-    # codes 
-    # |>  
-    # 
-    # 
-
     codes
     |> Enum.reduce({0, %{}}, fn code, {total, cache} ->
-      # Get number part for multiplying
       num =
         code
         |> Enum.take_while(&(&1 != "A"))
@@ -190,41 +110,6 @@ defmodule Day21 do
         final_cache = Map.put(new_cache, cache_key, total)
         {total, final_cache}
     end
-  end
-
-  defp find_seq(seq, cache) do
-    # IO.inspect(seq, label: "find seq")
-
-    seq
-    |> Enum.chunk_by(fn x -> x == :press end)
-    |> Enum.chunk_every(2)
-    |> Enum.map(&List.flatten/1)
-    |> Enum.reduce({[], cache}, fn s, {seq_, current_cache} ->
-      cache_key = Enum.join(s)
-      # IO.inspect("doing #{cache_key}")
-
-      if Map.has_key?(current_cache, cache_key) do
-        # IO.inspect("cached")
-        {seq_ ++ Map.get(current_cache, cache_key), current_cache}
-      else
-        # IO.inspect("not cached")
-
-        {_, shortest_seq} =
-          type_code_arrow(s, :press)
-          |> Enum.reduce({:infinity, []}, fn x, {min_, l} ->
-            if min_ == :infinity or length(x) < min_ do
-              {length(x), x}
-            else
-              {min_, l}
-            end
-          end)
-
-        updated_cache = Map.put(current_cache, cache_key, shortest_seq)
-        {seq_ ++ shortest_seq, updated_cache}
-      end
-
-      # |> tap(&IO.inspect/1)
-    end)
   end
 
   defp type_code(chars, state, pre \\ [])

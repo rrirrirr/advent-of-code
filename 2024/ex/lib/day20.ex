@@ -239,30 +239,6 @@ defmodule Day20 do
     abs(x1 - x2) + abs(y1 - y2)
   end
 
-  defp print_grid(grid) do
-    grid
-    |> Enum.map(fn row ->
-      row
-      |> Enum.map(fn
-        {"#", _x, _y, _score} ->
-          "###"
-
-        {_char, _x, _y, score} ->
-          cond do
-            score == :infinity -> " ∞ "
-            score < 10 -> "  #{score}"
-            score < 100 -> " #{score}"
-            true -> "#{score}"
-          end
-      end)
-      |> Enum.join(" ")
-    end)
-    |> Enum.join("\n")
-    |> IO.puts()
-
-    IO.puts("\n")
-  end
-
   defp get_input(file) do
     File.read!(file)
     |> String.split("\n", trim: true)
