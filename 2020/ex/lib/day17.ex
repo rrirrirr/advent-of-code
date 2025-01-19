@@ -95,7 +95,6 @@ defmodule Day17 do
   end
 
   defp get_neighbors_coords({x, y, z}) do
-    # {dx, dy, dz} != {0, 0, 0} do
     for dx <- -1..1,
         dy <- -1..1,
         dz <- -1..1 do
@@ -104,7 +103,6 @@ defmodule Day17 do
   end
 
   defp get_neighbors_coords_4d({x, y, z, w}) do
-    # {dx, dy, dz} != {0, 0, 0} do
     for dx <- -1..1,
         dy <- -1..1,
         dz <- -1..1,
